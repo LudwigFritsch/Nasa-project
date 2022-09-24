@@ -4,9 +4,9 @@ const launch = {
   flightNumber: 100,
   mission: "Kepler exploration X",
   rocket: "Explorer IS1",
-  launchData: new Date("December 27, 2030"),
+  launchDate: new Date("December 27, 2030"),
   destination: "Kepler-442 b",
-  customer: ["NASA"],
+  customer: ["NASA", "ESA"],
   upcoming: true,
   success: true,
 };
@@ -32,8 +32,10 @@ function addNewLaunch(launch) {
 
 function getNextFlightNumber() {
   const launchesArray = Array.from(launches.values());
-  const maxFlightNumber = Math.max(...launchesArray.map((o) => o.flightNumber));
-  return ++maxFlightNumber;
+  const nextFlightNumber = Math.max(
+    ...launchesArray.map((o) => o.flightNumber + 1)
+  );
+  return nextFlightNumber;
 }
 
 module.exports = {
