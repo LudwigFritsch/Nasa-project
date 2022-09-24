@@ -17,6 +17,26 @@ function getAllLaunches() {
   return Array.from(launches.values());
 }
 
+function addNewLaunch(launch) {
+  const flightNumber = getNextFlightNumber();
+  launches.set(
+    flightNumber,
+    Object.assign(launch, {
+      success: true,
+      upcoming: true,
+      customers: ["NASA"],
+      flightNumber,
+    })
+  );
+}
+
+function getNextFlightNumber() {
+  const launchesArray = Array.from(launches.values());
+  const maxFlightNumber = Math.max(...launchesArray.map((o) => o.flightNumber));
+  return ++maxFlightNumber;
+}
+
 module.exports = {
   getAllLaunches,
+  addNewLaunch,
 };
