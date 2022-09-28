@@ -18,7 +18,7 @@ mongoose.connection
   });
 
 const startServer = async () => {
-  await mongoose.connect(MONGO_URL);
+  mongoose.connect(process.env.MONGO_URL);
   await loadPlanetsData();
   server.listen(PORT, () => {
     console.log(`server listening on port ${PORT}`);
