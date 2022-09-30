@@ -10,9 +10,14 @@ mongoose.connection
   });
 
 async function mongoConnect() {
-  mongoose.connect(process.env.MONGO_URL);
+  await mongoose.connect(process.env.MONGO_URL);
+}
+
+async function mongoDisconnect() {
+  await mongoose.disconnect();
 }
 
 module.exports = {
   mongoConnect,
+  mongoDisconnect,
 };
