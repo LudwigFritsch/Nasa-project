@@ -3,8 +3,6 @@ const planets = require("./planets.mongo");
 
 const DEFAULT_FLIGHT_NUMBER = 100;
 
-const launchesMap = new Map();
-
 const launch = {
   flightNumber: 100,
   mission: "Kepler exploration X",
@@ -18,8 +16,8 @@ const launch = {
 
 saveLaunch(launch);
 
-function existsLaunchWithId(launchId) {
-  return launchesMap.has(launchId);
+async function existsLaunchWithId(launchId) {
+  return await launches.findOne({ flightNumber: launchId });
 }
 
 async function getLatestFlightNumber() {
@@ -66,11 +64,17 @@ async function scheduleNewLaunch(launch) {
   await saveLaunch(newLaunch);
 }
 
-function abortLaunchById(launchId) {
-  const aborted = launchesMap.get(launchId);
-  aborted.upcoming = false;
-  aborted.success = false;
-  return aborted;
+async function abortLaunchById(launchId) {
+  const aborted = await launches.updateOne(
+    {
+      flightNumber: launchId,
+    },
+    {
+      upcoming: false,
+      success: false,
+    }
+  );
+  return aborted.acknowledged === true && aborted.matchedCount === 1;
 }
 
 module.exports = {
