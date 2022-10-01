@@ -7,10 +7,11 @@ const DEFAULT_FLIGHT_NUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
 
 async function loadLaunchesData() {
-  const latestLaunch = await findLaunch({
-    flightNubmer: await getLatestFlightNumber(),
-  });
-  if (latestLaunch) {
+  const latestLaunch = await axios.get(
+    "https://api.spacexdata.com/v4/launches/latest"
+  );
+  const latestFlightNumberInDatabase = await getLatestFlightNumber();
+  if (latestLaunch.flight_number === latestFlightNumberInDatabase) {
     console.log("Launches already loaded");
   } else {
     await populateLaunches();
