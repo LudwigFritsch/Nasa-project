@@ -6,14 +6,22 @@ const planets = require("./planets.mongo");
 const DEFAULT_FLIGHT_NUMBER = 100;
 const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query";
 
-async function loadLaunchesData() {
-  const latestLaunch = await axios.get(
+async function latestLaunchLoaded() {
+  const response = await axios.get(
     "https://api.spacexdata.com/v4/launches/latest"
   );
-  const latestFlightNumberInDatabase = await getLatestFlightNumber();
-  if (latestLaunch.flight_number === latestFlightNumberInDatabase) {
+  const latestLaunch = response.data;
+  return await findLaunch({
+    flightNumber: latestLaunch.flight_number,
+  });
+}
+
+async function loadLaunchesData() {
+  const latestLaunchLoadedIntoDatabase = await latestLaunchLoaded();
+  if (latestLaunchLoadedIntoDatabase) {
     console.log("Launches already loaded");
   } else {
+    console.log("Populating launches");
     await populateLaunches();
   }
 }
@@ -44,6 +52,10 @@ async function populateLaunches() {
     },
   });
 
+  if (response.status !== 200) {
+    console.log("Problem downloading launch data");
+    throw new Error("Launch data download failed");
+  }
   const launchDocs = response.data.docs;
   for (const launchDoc of launchDocs) {
     const payloads = launchDoc.payloads;
@@ -57,8 +69,7 @@ async function populateLaunches() {
       success: launchDoc.success,
       customers,
     };
-    console.log(launch.flightNumber);
-    // TODO: populate launches collection
+    await saveLaunch(launch);
   }
 }
 
@@ -83,11 +94,6 @@ async function getAllLaunches() {
 }
 
 async function saveLaunch(launch) {
-  const planet = await planets.findOne({ keplerName: launch.target });
-  if (!planet) {
-    throw new Error("No matching planet was found");
-  }
-
   await launches.findOneAndUpdate(
     {
       flightNumber: launch.flightNumber,
@@ -107,6 +113,10 @@ async function scheduleNewLaunch(launch) {
     flightNumber: newFlightNumber,
   });
 
+  const planet = await planets.findOne({ keplerName: launch.target });
+  if (!planet) {
+    throw new Error("No matching planet was found");
+  }
   await saveLaunch(newLaunch);
 }
 
