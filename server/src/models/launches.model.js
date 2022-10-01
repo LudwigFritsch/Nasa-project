@@ -8,13 +8,15 @@ const launch = {
   mission: "Kepler exploration X",
   rocket: "Explorer IS1",
   launchDate: new Date("December 27, 2030"),
-  target: "Kepler-442 b",
+  target: "Kepler-62 f",
   customers: ["NASA", "ESA"],
   upcoming: true,
   success: true,
 };
 
-saveLaunch(launch);
+async function loadSingleLaunch() {
+  await saveLaunch(launch);
+}
 
 async function existsLaunchWithId(launchId) {
   return await launches.findOne({ flightNumber: launchId });
@@ -78,6 +80,7 @@ async function abortLaunchById(launchId) {
 }
 
 module.exports = {
+  loadSingleLaunch,
   existsLaunchWithId,
   getAllLaunches,
   scheduleNewLaunch,
