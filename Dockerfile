@@ -1,6 +1,7 @@
 FROM node:lts-alpine
 WORKDIR /app
-COPY pacakge*.json ./
+COPY package*.json ./
+RUN npm install --omit=dev
 
 COPY client/package*.json client/
 RUN npm install --prefix client --omit=dev
